@@ -28,12 +28,12 @@ class Account(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        constraints = [
+        constraints = (
             models.CheckConstraint(
                 condition=models.Q(balance__gte=0),
                 name="balance_not_negative",
             ),
-        ]
+        )
 
     def __str__(self):
         return f'{self.account_number} ({self.owner})'
@@ -42,6 +42,8 @@ class Transaction(models.Model):
     class Type(models.TextChoices):
         DEPOSIT = 'DEPOSIT', 'Deposit'
         WITHDRAWAL = 'WITHDRAWAL', 'Withdrawal'
+        TRANSFER_IN = 'TRANSFER_IN', 'Transfer in'
+        TRANSFER_OUT = 'TRANSFER_OUT', 'Transfer out'
 
     account = models.ForeignKey(
         Account,
@@ -55,7 +57,7 @@ class Transaction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ('-created_at',)
 
     def __str__(self):
         return f'{self.transaction_type} {self.amount} on {self.account.account_number}'
