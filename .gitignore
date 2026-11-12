@@ -11,3 +11,9 @@ wheels/
 
 # Django
 db.sqlite3
+
+# environments
+.env
+
+# vscode settings
+.vscode
