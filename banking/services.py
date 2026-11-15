@@ -81,7 +81,7 @@ def transfer(from_account_id, to_account_id, amount, description=""):
         sender.save(update_fields=["balance"])
         receiver.save(update_fields=["balance"])
 
-        Transaction.objects.create(
+        sent = Transaction.objects.create(
             account=sender,
             transaction_type=Transaction.Type.TRANSFER_OUT,
             amount=amount,
@@ -95,3 +95,5 @@ def transfer(from_account_id, to_account_id, amount, description=""):
             balance_after=receiver.balance,
             description=description or f"Transfer from {sender.account_number}",
         )
+
+        return sent

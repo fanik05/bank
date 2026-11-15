@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from rest_framework import serializers
 
 from .models import Account, Transaction
@@ -22,3 +24,16 @@ class TransactionSerializer(serializers.ModelSerializer):
             "created_at",
         )
         read_only_fields = fields
+
+
+class AmountSerializer(serializers.Serializer):
+    amount = serializers.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        min_value=Decimal("0.01"),
+    )
+    description = serializers.CharField(max_length=255, default="", allow_blank=True)
+
+
+class TransferSerializer(AmountSerializer):
+    to_account_number = serializers.CharField(max_length=10)
