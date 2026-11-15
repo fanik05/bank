@@ -6,6 +6,4 @@ from .models import User
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    fieldsets = UserAdmin.fieldsets + (
-        ('Extra info', {'fields': ('phone_number',)}),
-    )
+    fieldsets = UserAdmin.fieldsets + (("Extra info", {"fields": ("phone_number",)}),)
