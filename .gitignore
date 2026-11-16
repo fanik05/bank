@@ -17,3 +17,7 @@ db.sqlite3
 
 # vscode settings
 .vscode
+
+# Tool caches
+.pytest_cache/
+.ruff_cache/
