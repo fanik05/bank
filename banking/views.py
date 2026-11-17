@@ -13,11 +13,14 @@ from .serializers import (
 from .services import InsufficientFunds, deposit, transfer, withdraw
 
 
-class AccountListView(generics.ListAPIView):
+class AccountListView(generics.ListCreateAPIView):
     serializer_class = AccountSerializer
 
     def get_queryset(self):
         return Account.objects.filter(owner=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class AccountDetailView(generics.RetrieveAPIView):

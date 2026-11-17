@@ -127,3 +127,11 @@ def test_transfer_to_unknown_account_returns_400(alice_client, alice_account):
 
     assert response.status_code == 400
     assert "to_account_number" in response.data
+
+
+def test_customer_can_open_account(alice_client, alice):
+    response = alice_client.post("/api/accounts/", {}, format="json")
+
+    assert response.status_code == 201
+    assert response.data["balance"] == "0.00"
+    assert alice.bank_accounts.count() == 1
