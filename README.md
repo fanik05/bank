@@ -21,8 +21,11 @@ bank/
 │
 ├── accounts/              Users and authentication
 │   ├── models.py          Custom User model (adds phone_number)
-│   ├── urls.py            JWT login, refresh and logout endpoints
-│   └── test_auth.py       Authentication tests
+│   ├── serializers.py     User and registration serializers
+│   ├── views.py           Register and "me" endpoints
+│   ├── urls.py            Auth routes: register, me, JWT login, refresh, logout
+│   ├── test_auth.py       Authentication tests
+│   └── test_register.py   Registration and "me" tests
 │
 └── banking/               Accounts and money
     ├── models.py          Account and Transaction (the ledger)
@@ -104,11 +107,11 @@ uv run python manage.py runserver
 - API: http://127.0.0.1:8000/api/
 - Admin: http://127.0.0.1:8000/admin/
 
-Create customer users and bank accounts in the admin.
+Customers sign up with `POST /api/auth/register/` and open bank accounts with `POST /api/accounts/`. Deposits are made by staff, either through the API or in the admin.
 
 ## API
 
-All endpoints require authentication except login and refresh. Send the access token in a header:
+All endpoints require authentication except register, login and refresh. Send the access token in a header:
 
 ```
 Authorization: Bearer <access-token>
@@ -118,9 +121,13 @@ Authorization: Bearer <access-token>
 
 | Method | URL | Body | Returns |
 |---|---|---|---|
+| POST | `/api/auth/register/` | `username`, `password`, optional `email`, `first_name`, `last_name`, `phone_number` | the new user (without the password) |
 | POST | `/api/auth/token/` | `username`, `password` | `access` and `refresh` tokens |
 | POST | `/api/auth/token/refresh/` | `refresh` | new `access` and `refresh` tokens |
 | POST | `/api/auth/logout/` | `refresh` | `{}`; the refresh token is blacklisted |
+| GET | `/api/auth/me/` | | the logged-in user's `username`, `email`, `first_name`, `last_name`, `phone_number` |
+
+Passwords must pass Django's password validators: at least 8 characters, not too common, not only numbers, not too similar to the username.
 
 Access tokens last 5 minutes. Refresh tokens last 1 day and rotate: each refresh returns a new one and blacklists the old one.
 
@@ -129,6 +136,7 @@ Access tokens last 5 minutes. Refresh tokens last 1 day and rotate: each refresh
 | Method | URL | Who | Body |
 |---|---|---|---|
 | GET | `/api/accounts/` | Owner | |
+| POST | `/api/accounts/` | Any logged-in user | none; opens a new account with balance `0.00` |
 | GET | `/api/accounts/<account_number>/` | Owner | |
 | GET | `/api/accounts/<account_number>/transactions/` | Owner | |
 | POST | `/api/accounts/<account_number>/deposit/` | Staff only | `amount`, `description` (optional) |
